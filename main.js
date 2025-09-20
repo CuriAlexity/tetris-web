@@ -35,7 +35,7 @@ function resetGame() {
   dropAccumulator = 0;
   lastTime = 0;
   running = true;
-  overlay.hidden = true;
+  overlay.hidden = true; // ensure overlay hidden during gameplay
   spawnPiece();
   updateHUD();
 }
@@ -132,9 +132,14 @@ function rotate() {
   // basic wall kicks: try offsets
   const kicks = [0, -1, 1, -2, 2];
   for (const dx of kicks) {
-    if (!collides(test, grid, current.x + dx, current.y)) {
+    // also clamp within bounds after rotation by adjusting x
+    const shapeWidth = rotated[0].length;
+    const minX = 0;
+    const maxX = COLS - shapeWidth;
+    let targetX = Math.min(maxX, Math.max(minX, current.x + dx));
+    if (!collides(test, grid, targetX, current.y)) {
       current.shape = rotated;
-      current.x += dx;
+      current.x = targetX;
       sfx.rotate();
       return;
     }
@@ -143,9 +148,15 @@ function rotate() {
 
 function move(dx) {
   if (!current) return;
-  const x = current.x + dx;
-  if (!collides(current, grid, x, current.y)) {
-    current.x = x;
+  const shapeWidth = current.shape[0].length;
+  // clamp target x within board bounds considering shape width
+  let targetX = current.x + dx;
+  const minX = 0;
+  const maxX = COLS - shapeWidth;
+  if (targetX < minX) targetX = minX;
+  if (targetX > maxX) targetX = maxX;
+  if (!collides(current, grid, targetX, current.y)) {
+    current.x = targetX;
     sfx.move();
   }
 }
