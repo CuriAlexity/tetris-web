@@ -232,8 +232,9 @@ function drawSteel(px, py, color) {
 }
 
 function drawGridBackground() {
+  // Fill exact playable area only (no extra margin)
   ctx.fillStyle = Palette.background;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(0, 0, COLS * TILE_SIZE, ROWS * TILE_SIZE);
   ctx.strokeStyle = Palette.grid;
   ctx.lineWidth = 1;
   for (let x = 0; x <= COLS; x++) {
